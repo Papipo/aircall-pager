@@ -17,4 +17,11 @@ class Pager
     timer.set(id: service_id, seconds: ACK_TIMEOUT)
   end
 
+  def timeout(service_id)
+    alert = repo.escalate(service_id)
+    escalation.recipients(service_id: service_id, level: alert.level).each do |recipient|
+      notifier.call(recipient: recipient, message: alert.message)
+    end
+    timer.set(id: service_id, seconds: ACK_TIMEOUT)
+  end
 end

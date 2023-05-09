@@ -32,4 +32,24 @@ RSpec.describe Pager do
       expect(timer).to receive(:set).with({id: service_id, seconds: 60 * 15})
     end
   end
+
+  describe "timeout on Unhealthy service" do
+    let(:level) { 2 }
+    let(:alert) { double("Alert", level: level, message: message) }
+
+    before do
+      allow(repo).to receive(:escalate).with(service_id).and_return(alert)
+      allow(escalation).to receive(:recipients).with(service_id: service_id, level: level).and_return([recipient])
+    end
+
+    after { pager.timeout(service_id) }
+
+    it "notifies all targets of the first level of the escalation policy" do
+      expect(notifier).to receive(:call).once.with({recipient: recipient, message: message})
+    end
+
+    it "sets a 15-minutes acknowledgement delay" do
+      expect(timer).to receive(:set).with({id: service_id, seconds: 60 * 15})
+    end
+  end
 end
