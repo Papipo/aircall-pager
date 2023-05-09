@@ -19,6 +19,8 @@ class Pager
 
   def timeout(service_id)
     alert = repo.escalate(service_id)
+    return unless alert
+    
     escalation.recipients(service_id: service_id, level: alert.level).each do |recipient|
       notifier.call(recipient: recipient, message: alert.message)
     end

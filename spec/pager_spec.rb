@@ -52,4 +52,20 @@ RSpec.describe Pager do
       expect(timer).to receive(:set).with({id: service_id, seconds: 60 * 15})
     end
   end
+
+  describe "timeout on Healthy service" do
+    before do
+      allow(repo).to receive(:escalate).with(service_id).and_return(false)
+    end
+
+    after { pager.timeout(service_id) }
+
+    it "doesn't set the timer" do
+      expect(timer).not_to receive(:set)
+    end
+
+    it "doesn't send any notifications" do
+      expect(notifier).not_to receive(:call)
+    end
+  end
 end
