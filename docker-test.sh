@@ -1,0 +1,1 @@
+sudo docker run -it --rm --name pager-tests -v "$PWD":/usr/src/myapp -w /usr/src/myapp ruby:3.2.2 bundle install --quiet && rspec
